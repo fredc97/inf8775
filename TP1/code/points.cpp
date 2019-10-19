@@ -213,7 +213,7 @@ while (infile >> point.x >> point.y)
     cout << resultat << endl; // Exemple de distance, ici une valeur bidon
   }
   if (show_t) {
-    cout << timeElapsed/1000000  << endl; // Exemple de temps, ici une valeur bidon
+    cout << timeElapsed  << endl; // Exemple de temps, ici une valeur bidon
   }
   
   return 0; 
