@@ -203,7 +203,6 @@ int size = 0;
         resultat = closest(points, z);
         auto t2 = std::chrono::high_resolution_clock::now();
         timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); 
-        cout << timeElapsed;
       }
       else {
 	cout << "Erreur: Algo inconnu" << endl;
