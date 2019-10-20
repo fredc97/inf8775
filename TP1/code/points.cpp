@@ -6,7 +6,7 @@
 #include <math.h> 
 #include <chrono> 
 using namespace std; 
-std::ifstream infile("1000-2.txt");
+
 
 int z = 0;
 
@@ -156,23 +156,26 @@ int main(int argc, char* argv[]) {
   bool show_t = false;
   
 	
-Point point;
-Point points[1000];
+
 int resultat = 0;
 double timeElapsed = 0;
-while (infile >> point.x >> point.y)
-{
-		points[z].x =  point.x ;
-		points[z].y = point.y;
-		z++;	
-}
-
-
+Point point;    
+Point points[9000];
+int size = 0; 
 
     for (int i=1; i<argc; i++) {
     if (!strcmp(argv[i], "-e")) {
       i++;
       fn = argv[i];
+      std::ifstream infile(fn);
+      
+	while (infile >> point.x >> point.y)
+	{
+			points[z].x =  point.x ;
+			points[z].y = point.y;
+			z++;	
+      
+	}
     }
     else if (!strcmp(argv[i], "-p")) {
 		
@@ -191,16 +194,16 @@ while (infile >> point.x >> point.y)
 	// p en bas cest le resultat de lalgo force brute
 	// t en bas ben c le temps
   auto t1 = std::chrono::high_resolution_clock::now();
-	resultat = bruteForce(points, 1000);
+	resultat = bruteForce(points, z);
   auto t2 = std::chrono::high_resolution_clock::now();
   timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); 
       }
       else if (!strcmp(argv[i], "seuil")) {
         auto t1 = std::chrono::high_resolution_clock::now();
-        resultat = closest(points, 1000);
+        resultat = closest(points, z);
         auto t2 = std::chrono::high_resolution_clock::now();
         timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); 
-	// todo
+        cout << timeElapsed;
       }
       else {
 	cout << "Erreur: Algo inconnu" << endl;
