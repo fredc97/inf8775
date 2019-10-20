@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
 int resultat = 0;
 double timeElapsed = 0;
 Point point;    
-Point points[9000];
+Point points[64000];
 int size = 0; 
 
     for (int i=1; i<argc; i++) {
