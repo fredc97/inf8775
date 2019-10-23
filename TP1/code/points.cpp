@@ -81,8 +81,8 @@ float stripClosest(Point strip[], int size, float d)
 // sorted according to y coordinates 
 float closestUtil(Point Px[], Point Py[], int n) 
 { 
-    // If there are 1 points, then use brute force (recursivity threshold = 1)
-    if (n <= 1) 
+    // If there are 4 points, then use brute force (recursivity threshold = 4)
+    if (n <= 4) 
         return bruteForce(Px, n); 
   
     // Find the middle point 
@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
 	
 
 int resultat = 0;
-double timeElapsed = 0;
+int timeElapsed = 0;
 Point point;    
 Point points[64000];
 int size = 0; 
@@ -189,10 +189,7 @@ int size = 0;
 
       i++;
       if (!strcmp(argv[i], "brute")) {
-	// todo
-	// balise pour le temps 
-	// p en bas cest le resultat de lalgo force brute
-	// t en bas ben c le temps
+
   auto t1 = std::chrono::high_resolution_clock::now();
 	resultat = bruteForce(points, z);
   auto t2 = std::chrono::high_resolution_clock::now();
@@ -202,7 +199,7 @@ int size = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
         resultat = closest(points, z);
         auto t2 = std::chrono::high_resolution_clock::now();
-        timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count(); 
+        timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
       }
       else {
 	cout << "Erreur: Algo inconnu" << endl;
