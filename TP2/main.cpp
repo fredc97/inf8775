@@ -67,28 +67,34 @@ std::ostream &operator<<(std::ostream &str, const Solution &p)
 
 Solution progDyn(Roll roll)
 {
-  Solution sol;
-  int r[roll.sizeRoll];
-  cout <<"ok";
-  vector<int> longueurCut = roll.sizeCuts;
-  vector<int> priceCut = roll.priceCuts;
+  
+  vector<int> sizeCuts = roll.sizeCuts;
+  vector<int> priceCuts = roll.priceCuts;
+  Solution sol[roll.sizeRoll + 1];
+  sol[0].profit = 0;
 
-  for (int j = 0; j < roll.sizeRoll; j++)
+  for (int i = 1; i <= roll.sizeRoll; i++)
   {
-    for (int i = 0; i < roll.priceCuts.size(); i++)
+    int max_profit = -2;
+    vector<int> sizeCutsStep;
+    for (int j = 0; j < i; j++)
     {
-      // taille 0 
-      if (j == 0)
-      {
-        r[j] = 0;
+      int new_profit = priceCuts[j] + sol[i-j-1].profit;
+      max_profit = max(max_profit, new_profit);
+
+      if (max_profit == new_profit) {
+        sizeCutsStep.push_back(sizeCuts.at(j));
       }
-      else
-      {
-        
-      }
+
+      //cout << "Max profit : " << max_profit << "and" << new_profit << "\n";
+     
+
     }
+    sol[i].profit = max_profit;
+    sol[i].sizeCuts = sizeCutsStep;
+    //cout << max_profit << "\n"; 
   }
-  return sol;
+  return sol[roll.sizeRoll];
 }
 
 /**
@@ -119,14 +125,15 @@ Solution glouton(Roll roll)
   while (rentabilities.size() > 0 && sum <= roll.sizeRoll)
   {
     Rentability r = *max_element(rentabilities.begin(), rentabilities.end(), cmp);
-    // cout << r.ratio << " : " << r.cutSize << " : " << r.cutProfit << " : " << sol.profit << " \n";
+    //cout << r.ratio << " : " << r.cutSize << " : " << r.cutProfit << " : " << sol.profit << " \n";
 
     int sumTemp = sum;
+
     if (sumTemp + r.cutSize <= roll.sizeRoll)
     {
       sum += r.cutSize;
       sol.sizeCuts.push_back(r.cutSize);
-      sol.profit += r.cutSize * r.cutProfit;
+      sol.profit += r.cutProfit;
     }
     else
     {
