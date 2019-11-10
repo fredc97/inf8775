@@ -166,14 +166,18 @@ Solution backtrack(Roll roll)
 	cout <<"ratio  "<< rentabilities[i].ratio<<endl;
 	cout << roll.sizeRoll<<endl;
   }
-	
+
+	int tailleRouleau =0;	
    for (int i = 0; i < rentabilities.size(); i++)			// parcourir tableau de rentabilite
   {		
-	if(rentabilities[i].ratio >= rentabilities[i+1].ratio)	{	// si le ratio suivant est plus petit que le precedent
-		rentabilities.erase(rentabilities.begin()+i+1);							// supprimer l'element
+	if ( tailleRouleau <= rentabilities[i].cutSize){
+		if(rentabilities[i].ratio >= rentabilities[i+1].ratio)	{	// si le ratio suivant est plus petit que le precedent
+			rentabilities.erase(rentabilities.begin()+i+1);							// supprimer l'element
+			tailleRouleau += rentabilities[i].cutSize;
+		}
+		 sol.sizeCuts.push_back(rentabilities[i].cutSize);
+		  sol.profit +=rentabilities[i].cutProfit ;
 	}
-	 sol.sizeCuts.push_back(rentabilities[i].cutSize);
-	  sol.profit +=rentabilities[i].cutProfit ;
   } 
 	return sol;
 
