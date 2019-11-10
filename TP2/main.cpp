@@ -8,7 +8,6 @@
 #include <chrono>
 #include <vector>
 #include <iterator>
-#include <climits>
 #include <algorithm>
 using namespace std;
 
@@ -76,20 +75,24 @@ Solution progDyn(Roll roll)
 
   for (int i = 1; i <= roll.sizeRoll; i++)
   {
-    int max_profit = -1;
+    int max_profit = -2;
     vector<int> sizeCutsStep;
     for (int j = 0; j < i; j++)
     {
       int new_profit = priceCuts[j] + sol[i-j-1].profit;
       max_profit = max(max_profit, new_profit);
 
-      if (max_profit == new_profit && j > 0) {
-        sizeCutsStep.push_back(j);
-      }     
+      if (max_profit == new_profit) {
+        sizeCutsStep.push_back(sizeCuts.at(j));
+      }
+
+      //cout << "Max profit : " << max_profit << "and" << new_profit << "\n";
+     
 
     }
     sol[i].profit = max_profit;
     sol[i].sizeCuts = sizeCutsStep;
+    //cout << max_profit << "\n"; 
   }
   return sol[roll.sizeRoll];
 }
@@ -139,6 +142,41 @@ Solution glouton(Roll roll)
   }
 
   return sol;
+}
+
+Solution backtrack(Roll roll)
+{
+	 Solution sol;
+  // Rentability vector
+  vector<Rentability> rentabilities;
+  for (int i = 0; i < roll.sizeCuts.size(); i++)
+  {
+    Rentability ri;
+    ri.cutSize = roll.sizeCuts.at(i);
+    ri.cutProfit = roll.priceCuts.at(i);
+    ri.ratio = (double)ri.cutProfit / (double)ri.cutSize;
+    rentabilities.push_back(ri);
+  }
+  for (int i = 0; i < rentabilities.size(); i++)
+  {		
+	cout <<"************************* "<< i<<endl;
+	cout <<"POUR Le rouleau "<< i<<endl;
+	cout <<"cutsize: "<< rentabilities[i].cutSize<<endl;
+	cout <<"cutProfit: "<< rentabilities[i].cutProfit<<endl;
+	cout <<"ratio  "<< rentabilities[i].ratio<<endl;
+	cout << roll.sizeRoll<<endl;
+  }
+	
+   for (int i = 0; i < rentabilities.size(); i++)			// parcourir tableau de rentabilite
+  {		
+	if(rentabilities[i].ratio >= rentabilities[i+1].ratio)	{	// si le ratio suivant est plus petit que le precedent
+		rentabilities.erase(rentabilities.begin()+i+1);							// supprimer l'element
+	}
+	 sol.sizeCuts.push_back(rentabilities[i].cutSize);
+	  sol.profit +=rentabilities[i].cutProfit ;
+  } 
+	return sol;
+
 }
 
 int main(int argc, char *argv[])
@@ -230,9 +268,15 @@ int main(int argc, char *argv[])
         auto t2 = std::chrono::high_resolution_clock::now();
         timeElapsed = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
       }
+	else if (!strcmp(argv[i], "backtrack"))
+	{
+		 cout << "Algo BACKTRACK" << endl;
+		resultat = backtrack(roll);
+	}
       else
       {
         cout << "Erreur: Algo inconnu" << endl;
+
         return -1;
       }
     }
