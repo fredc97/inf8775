@@ -8,6 +8,7 @@
 #include <chrono>
 #include <vector>
 #include <iterator>
+#include <climits>
 #include <algorithm>
 using namespace std;
 
@@ -75,24 +76,20 @@ Solution progDyn(Roll roll)
 
   for (int i = 1; i <= roll.sizeRoll; i++)
   {
-    int max_profit = -2;
+    int max_profit = -1;
     vector<int> sizeCutsStep;
     for (int j = 0; j < i; j++)
     {
       int new_profit = priceCuts[j] + sol[i-j-1].profit;
       max_profit = max(max_profit, new_profit);
 
-      if (max_profit == new_profit) {
-        sizeCutsStep.push_back(sizeCuts.at(j));
-      }
-
-      //cout << "Max profit : " << max_profit << "and" << new_profit << "\n";
-     
+      if (max_profit == new_profit && j > 0) {
+        sizeCutsStep.push_back(j);
+      }     
 
     }
     sol[i].profit = max_profit;
     sol[i].sizeCuts = sizeCutsStep;
-    //cout << max_profit << "\n"; 
   }
   return sol[roll.sizeRoll];
 }
