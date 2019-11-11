@@ -82,8 +82,8 @@ Solution progDyn(Roll roll)
       int new_profit = priceCuts[j] + sol[i-j-1].profit;
       max_profit = max(max_profit, new_profit);
 
-      if (max_profit == new_profit) {
-        sizeCutsStep.push_back(sizeCuts.at(j));
+      if (max_profit == new_profit and j > 0) {
+        sizeCutsStep.push_back(j);
       }
 
       //cout << "Max profit : " << max_profit << "and" << new_profit << "\n";
