@@ -72,29 +72,31 @@ Solution progDyn(Roll roll)
   vector<int> sizeCuts = roll.sizeCuts;
   vector<int> priceCuts = roll.priceCuts;
   Solution sol[roll.sizeRoll + 1];
-  sol[0].profit = 0;
+  int sizeCutsStep[roll.sizeRoll + 1];
+  std::fill_n(sizeCutsStep, roll.sizeRoll + 1, 1);
 
+  sol[0].profit = 0;
+  int max_profit = -1;
   for (int i = 1; i <= roll.sizeRoll; i++)
   {
-    int max_profit = -2;
-    vector<int> sizeCutsStep;
     for (int j = 0; j < i; j++)
     {
       int new_profit = priceCuts[j] + sol[i-j-1].profit;
-      max_profit = max(max_profit, new_profit);
-
-      if (max_profit == new_profit and j > 0) {
-        sizeCutsStep.push_back(j);
-      }
-
-      //cout << "Max profit : " << max_profit << "and" << new_profit << "\n";
-     
-
+      if (new_profit > max_profit) {
+        max_profit = new_profit;
+        sizeCutsStep[i] = j + 1;
+      }    
     }
     sol[i].profit = max_profit;
-    sol[i].sizeCuts = sizeCutsStep;
-    //cout << max_profit << "\n"; 
   }
+
+    int total_lenght = roll.sizeRoll; 
+    vector<int> cutsSolution;
+    while (total_lenght > 0) {
+      cutsSolution.push_back(sizeCutsStep[total_lenght]);
+      total_lenght = total_lenght - sizeCutsStep[total_lenght];
+    } 
+    sol[roll.sizeRoll].sizeCuts = cutsSolution;
   return sol[roll.sizeRoll];
 }
 
