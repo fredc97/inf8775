@@ -57,6 +57,7 @@ std::ostream &operator<<(std::ostream &str, const Solution &p)
   return str;
 }
 
+
 /**
  * ----------------------------
  * ---------------------
@@ -167,19 +168,40 @@ Solution backtrack(Roll roll)
 	cout << roll.sizeRoll<<endl;
   }
 
-	int tailleRouleau =0;	
-   for (int i = 0; i < rentabilities.size(); i++)			// parcourir tableau de rentabilite
-  {		
-	if ( tailleRouleau <= rentabilities[i].cutSize){
-		if(rentabilities[i].ratio >= rentabilities[i+1].ratio)	{	// si le ratio suivant est plus petit que le precedent
-			rentabilities.erase(rentabilities.begin()+i+1);							// supprimer l'element
-			tailleRouleau += rentabilities[i].cutSize;
+int tailleRouleau =0;
+int index =1;
+int i = index + 1;
+int tempprofit = 0;
+/*** Premier noeud ***/
+tailleRouleau += rentabilities[0].cutSize;		
+sol.sizeCuts.push_back(rentabilities[0].cutSize);
+sol.profit +=rentabilities[0].cutProfit ;
+
+/*** premiere chemin ***/
+while(tailleRouleau <  10) {
+	for (int j = index; j < rentabilities.size(); j++)		
+	{	
+		tempprofit = sol.profit;
+		if (tempprofit > sol.profit){
+			return sol;			
 		}
-		 sol.sizeCuts.push_back(rentabilities[i].cutSize);
-		  sol.profit +=rentabilities[i].cutProfit ;
 	}
-  } 
-	return sol;
+
+	for (int j = index +1 ; j < rentabilities.size(); j++)		
+	{		
+		
+	}
+	tailleRouleau += rentabilities[i].cutSize;
+	cout<< "taille du rouleau :"<<tailleRouleau<<"Pour un cutsize de :"<<rentabilities[i].cutSize<<endl;		
+	sol.sizeCuts.push_back(rentabilities[i].cutSize);
+	sol.profit +=rentabilities[i].cutProfit ;
+	tempprofit = sol.profit;
+	i++;	
+
+}
+
+
+	return sol; 
 
 }
 
