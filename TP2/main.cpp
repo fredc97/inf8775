@@ -212,6 +212,7 @@ int main(int argc, char *argv[])
   char *fn = nullptr;
   bool show_p = false;
   bool show_t = false;
+  bool show_c = false;
 
   Solution resultat;
   double timeElapsed = 0;
@@ -274,6 +275,11 @@ int main(int argc, char *argv[])
 
       show_p = true;
     }
+    else if (!strcmp(argv[i], "-c"))
+    {
+
+      show_c = true;
+    }
     else if (!strcmp(argv[i], "-t"))
     {
 
@@ -287,7 +293,7 @@ int main(int argc, char *argv[])
         auto t1 = std::chrono::high_resolution_clock::now();
         resultat = glouton(roll);
         auto t2 = std::chrono::high_resolution_clock::now();
-        timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
       }
       else if (!strcmp(argv[i], "dynamique"))
       {
@@ -312,11 +318,15 @@ int main(int argc, char *argv[])
 
   if (show_p)
   {
-    cout << resultat.profit << " with : " << resultat << endl;
+    cout << resultat.profit << " ";
+  }
+   if (show_c)
+  {
+    cout << resultat << endl;
   }
   if (show_t)
   {
-    cout << "Time elapsed : " << (double)timeElapsed << endl;
+    cout << (double)timeElapsed << endl;
   }
 
   return 0;
