@@ -70,7 +70,8 @@ Solution progDyn(Roll roll)
   Solution sol[roll.sizeRoll + 1];
   int sizeCutsStep[roll.sizeRoll + 1];
   std::fill_n(sizeCutsStep, roll.sizeRoll + 1, 1);
-
+  int t = 0;
+  int s = 0;
   sol[0].profit = 0;
   int max_profit = -1;
   for (int i = 1; i <= roll.sizeRoll; i++)
