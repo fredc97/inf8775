@@ -31,15 +31,6 @@ struct Rentability
   double ratio;
 };
 
-vector<Rentability> RemoveCut(vector<Rentability> r, int cutSize, int profit)
-{
-  r.erase(
-      std::remove_if(r.begin(), r.end(), [&](Rentability const &r2) {
-        return (r2.cutSize == cutSize && r2.cutProfit == profit);
-      }),
-      r.end());
-  return r;
-}
 
 bool cmp(const Rentability &lhs, const Rentability &rhs)
 {
@@ -56,6 +47,11 @@ std::ostream &operator<<(std::ostream &str, const Solution &p)
   str << "]";
   return str;
 }
+
+bool compareRentability(Rentability r1, Rentability r2) 
+{ 
+    return (r1.ratio > r2.ratio); 
+} 
 
 
 /**
@@ -123,15 +119,16 @@ Solution glouton(Roll roll)
     ri.ratio = (double)ri.cutProfit / (double)ri.cutSize;
     rentabilities.push_back(ri);
   }
+  sort(rentabilities.begin(), rentabilities.end(), compareRentability);
 
+
+  int i = 0;
   // algorithme glouton
-  while (rentabilities.size() > 0 && sum <= roll.sizeRoll)
+  while (i < rentabilities.size())
   {
-    Rentability r = *max_element(rentabilities.begin(), rentabilities.end(), cmp);
-    //cout << r.ratio << " : " << r.cutSize << " : " << r.cutProfit << " : " << sol.profit << " \n";
+    Rentability r = rentabilities.at(i);
 
     int sumTemp = sum;
-
     if (sumTemp + r.cutSize <= roll.sizeRoll)
     {
       sum += r.cutSize;
@@ -140,10 +137,9 @@ Solution glouton(Roll roll)
     }
     else
     {
-      rentabilities = RemoveCut(rentabilities, r.cutSize, r.cutProfit);
+      i++;
     }
   }
-
   return sol;
 }
 
@@ -293,7 +289,7 @@ int main(int argc, char *argv[])
         auto t1 = std::chrono::high_resolution_clock::now();
         resultat = glouton(roll);
         auto t2 = std::chrono::high_resolution_clock::now();
-        timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+        timeElapsed = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
       }
       else if (!strcmp(argv[i], "dynamique"))
       {
@@ -320,13 +316,13 @@ int main(int argc, char *argv[])
   {
     cout << resultat.profit << " ";
   }
-   if (show_c)
-  {
-    cout << resultat << endl;
-  }
   if (show_t)
   {
     cout << (double)timeElapsed << endl;
+  }
+  if (show_c)
+  {
+    cout << resultat << endl;
   }
 
   return 0;
