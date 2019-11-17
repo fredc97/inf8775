@@ -144,10 +144,47 @@ Solution glouton(Roll roll)
   return sol;
 }
 
+/**
+ * ----------------------------
+ * ---------------------
+ * Algorithme backtrack
+ * ---------------------
+ * ----------------------------
+**/
+
+int profitmax=0;
+vector<Rentability> cutfinal;
+
+void cutSet(vector<Rentability>& rentabilities, int sum, 
+                 vector<Rentability>& rentabilitiesTemp, int node, Solution& sol) 
+{ 
+    if (sum < 0) 
+        return;   
+    if (sum == 0) 
+    { 
+      int sommeTot = 0;
+      for (int i = 0; i<rentabilitiesTemp.size(); i++){
+                sommeTot += rentabilitiesTemp[i].cutProfit;
+            }
+        if (sommeTot > profitmax){
+            profitmax = sommeTot;
+            sol.profit = sommeTot;
+            cutfinal=rentabilitiesTemp;
+        }
+        return; 
+    } 
+    for (int i = node; i < rentabilities.size() && sum - rentabilities[i].cutSize >= 0; i++ ) 
+    { 
+        rentabilitiesTemp.push_back(rentabilities[i]); 
+        cutSet(rentabilities, sum - rentabilities[i].cutSize, rentabilitiesTemp, i,sol); 
+        rentabilitiesTemp.pop_back(); 
+    } 
+} 
+  
 Solution backtrack(Roll roll)
 {
 	 Solution sol;
-  // Rentability vector
+
   vector<Rentability> rentabilities;
   for (int i = 0; i < roll.sizeCuts.size(); i++)
   {
@@ -157,53 +194,16 @@ Solution backtrack(Roll roll)
     ri.ratio = (double)ri.cutProfit / (double)ri.cutSize;
     rentabilities.push_back(ri);
   }
-  for (int i = 0; i < rentabilities.size(); i++)
-  {		
-	cout <<"************************* "<< i<<endl;
-	cout <<"POUR Le rouleau "<< i<<endl;
-	cout <<"cutsize: "<< rentabilities[i].cutSize<<endl;
-	cout <<"cutProfit: "<< rentabilities[i].cutProfit<<endl;
-	cout <<"ratio  "<< rentabilities[i].ratio<<endl;
-	cout << roll.sizeRoll<<endl;
-  }
 
-int tailleRouleau =0;
-int index =1;
-int i = index + 1;
-int tempprofit = 0;
-/*** Premier noeud ***/
-tailleRouleau += rentabilities[0].cutSize;		
-sol.sizeCuts.push_back(rentabilities[0].cutSize);
-sol.profit +=rentabilities[0].cutProfit ;
+    vector<Rentability> r; 
+    cutSet(rentabilities, roll.sizeRoll,r, 0,sol); 
 
-/*** premiere chemin ***/
-while(tailleRouleau <  10) {
-	for (int j = index; j < rentabilities.size(); j++)		
-	{	
-		tempprofit = sol.profit;
-		if (tempprofit > sol.profit){
-			return sol;			
-		}
-	}
-
-	for (int j = index +1 ; j < rentabilities.size(); j++)		
-	{		
-		
-	}
-	tailleRouleau += rentabilities[i].cutSize;
-	cout<< "taille du rouleau :"<<tailleRouleau<<"Pour un cutsize de :"<<rentabilities[i].cutSize<<endl;		
-	sol.sizeCuts.push_back(rentabilities[i].cutSize);
-	sol.profit +=rentabilities[i].cutProfit ;
-	tempprofit = sol.profit;
-	i++;	
-
-}
-
-
+    for (int i = 0; i<cutfinal.size(); i++){
+                sol.sizeCuts.push_back(cutfinal[i].cutSize);
+            }
 	return sol; 
 
 }
-
 int main(int argc, char *argv[])
 {
   char *fn = nullptr;
