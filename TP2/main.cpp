@@ -287,17 +287,18 @@ int main(int argc, char *argv[])
       i++;
       if (!strcmp(argv[i], "glouton"))
       {
-        auto t1 = std::chrono::high_resolution_clock::now();
+         chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
         resultat = glouton(roll);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        timeElapsed = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+         chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+        timeElapsed = (double)std::chrono::duration<double>(t2 - t1).count();
       }
       else if (!strcmp(argv[i], "dynamique"))
       {
-        auto t1 = std::chrono::high_resolution_clock::now();
+        chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
         resultat = progDyn(roll);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        timeElapsed = (double)std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+        chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+        
+        timeElapsed = (double)std::chrono::duration<double>(t2 - t1).count();
       }
 	else if (!strcmp(argv[i], "backtrack"))
 	{
@@ -319,7 +320,7 @@ int main(int argc, char *argv[])
   }
   if (show_t)
   {
-    cout << (double)timeElapsed << endl;
+    cout <<timeElapsed * 1000 << endl;
   }
   if (show_c)
   {
