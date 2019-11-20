@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
       if (!strcmp(argv[i], "glouton"))
       {
          chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-        resultat = glouton(roll);
+		 resultat = glouton(roll);
          chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
         timeElapsed = (double)std::chrono::duration<double>(t2 - t1).count();
       }
