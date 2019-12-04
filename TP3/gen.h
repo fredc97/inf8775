@@ -9,7 +9,11 @@ using namespace std;
 const int POPULATION_SIZE = 25;
 const int TOURNAMENT_ROUND = 5;
 const int SURVIVANTS = 20;
-const int MUTATIONS = 30;
+const int MUTATIONS = 10;
+const int MAX_SEARCH_MUTATES = 50;
+const int WAVE_VIRUS = 1000;
+const int PROPORTION_VIRUS = 0.1;
+const int EQUALITY_MAX = 2;
 struct Pack
 {
   vector<int> cards; 
@@ -44,3 +48,4 @@ Population selectBestOnes(Population &population, int n_best, Game &game);
 void resolve(Population &population, Game &game);
 Population mutation(Population &pop, Game &game);
 Individual mutationIndividual(Individual &ind, Game &game);
+Population virus(Population &pop, Game &game, int proportion);
