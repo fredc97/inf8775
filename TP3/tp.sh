@@ -15,7 +15,7 @@ case $key in
     EX_PATH="$2"
     shift
     ;;
-    -p|-t|-c)
+    -p)
     OPTIONS="${OPTIONS}${1} "
     ;;
     *)

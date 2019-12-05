@@ -11,11 +11,9 @@
 #include <unistd.h>
 using namespace std;
 
-// vecteur des positions dans le fichier
-// melange
-
 Individual generateInitialInd(Game &game)
 {
+    
     std::random_device random_device;
     std::mt19937 random_engine(random_device());
     std::uniform_int_distribution<int> distribution_1_100(0, game.cards.size() - 1);
@@ -29,7 +27,6 @@ Individual generateInitialInd(Game &game)
         {
             int randomNumber = distribution_1_100(random_engine);
 
-            // cout<<i<<" - Index : "<<randomNumber<<" >> "<<cards.at(randomNumber)<<"\n";
             if (std::find(global.begin(), global.end(), randomNumber) == global.end())
             {
                 pack.cards.push_back(randomNumber);
@@ -38,7 +35,6 @@ Individual generateInitialInd(Game &game)
             }
             else
             {
-                //cout<<"Already exist "<<i<<"\n";
                 i--;
                 continue;
             }
@@ -108,7 +104,7 @@ std::ostream &operator<<(std::ostream &str, vector<Pack> &p)
     return str;
 }
 
-void evolvePopulation(Population &population, Game &game)
+void evolvePopulation(Population &population, Game &game, bool printPack)
 {
     Population pop;
     pop = population;
@@ -118,25 +114,19 @@ void evolvePopulation(Population &population, Game &game)
     int iterationWithSameSolution = 0;
     int nbVirusPop = 1;
     int apocalyps = 0;
-    bool print = 0;
     while (true)
     {
-         if (apocalyps > APOCALYPS)
-            {
-
-                cout<<"DESTROY  \n";
-                pop = annihilation(pop, game);
-                iterationWithSameSolution = 0;
-                apocalyps = 0;
-            }
+        if (apocalyps > APOCALYPS)
+        {
+            pop = annihilation(pop, game);
+            iterationWithSameSolution = 0;
+            apocalyps = 0;
+        }
         if (iterationWithSameSolution > WAVE_VIRUS)
         {
-    
-          
-                //cout << "Virus - " << pop.individuals.size() << "\n";
-                pop = virus(pop, game, nbVirusPop);
-                iterationWithSameSolution = 0;
-            
+
+            pop = virus(pop, game, nbVirusPop);
+            iterationWithSameSolution = 0;
 
             if (nbVirusPop != 5)
             {
@@ -146,48 +136,34 @@ void evolvePopulation(Population &population, Game &game)
             {
                 nbVirusPop = 1;
             }
-            affichage(pop, game);
         }
 
-        //cout << "New iteration - " << pop.individuals.size() << "\n";
-
-        affichage(pop, game);
-
-        if (print)
-            cout << "On mutate - " << pop.individuals.size() << "\n";
         pop = mutation(pop, game);
-        affichage(pop, game);
-        if (print)
-            cout << "Sélection des meilleurs - " << pop.individuals.size() << "\n";
+
         selection(pop, game, ind1, ind2);
-        affichage(pop, game);
 
-        if (print)
-            cout << "Crossover ! - " << pop.individuals.size() << "\n";
         newInd = crossover(ind1, ind2, game);
-        affichage(pop, game);
 
-        if (print)
-            cout << "On push le new individu - " << pop.individuals.size() << "\n";
         pop.individuals.push_back(newInd);
         pop.individuals.push_back(ind1);
         pop.individuals.push_back(ind2);
-        affichage(pop, game);
 
-        if (print)
-            cout << "Survivants - " << pop.individuals.size() << "\n";
         pop = selectBestOnes(pop, game.n_packs, game);
 
-        affichage(pop, game);
 
         int actualSol = fitnessIndividual(pop.individuals.at(0), game);
         if (actualSol > bestSolution)
         {
-            //pop.individuals.erase(pop.individuals.begin());
             bestSolution = actualSol;
             iterationWithSameSolution = 0;
-            //cout << pop.individuals.at(0).packs;
-            cout << bestSolution << "\n";
+            if (printPack)
+            {
+                cout << pop.individuals.at(0).packs;
+            }
+            else
+            {
+                cout << bestSolution << "\n";
+            }
             nbVirusPop = 1;
         }
         else
@@ -195,27 +171,14 @@ void evolvePopulation(Population &population, Game &game)
             iterationWithSameSolution++;
         }
 
-        // affichage();
         apocalyps++;
     }
 }
 
-void affichage(Population &pop, Game &game)
-{
-    /*
-    for (int i = 0; i<pop.individuals.size(); i++) {
-    cout<<fitnessIndividual(pop.individuals.at(i), game)<<"\n";
-    
-    }
-    cout<<"\n";
-    */
-}
 
-void resolve(Population &population, Game &game)
+void resolve(Population &population, Game &game, bool printPack)
 {
-    cout << "Start evolution \n";
-
-    evolvePopulation(population, game);
+    evolvePopulation(population, game, printPack);
 }
 
 class compareFitnessIndividual
@@ -245,7 +208,6 @@ Population selectBestOnes(Population &population, int n_best, Game &game)
     {
         newPop.individuals.push_back(population.individuals.at(survivant));
         survivant++;
-
     }
     sort(newPop.individuals.begin(), newPop.individuals.end(), compareFitnessIndividual(game));
 
@@ -268,7 +230,7 @@ Population virus(Population &pop, Game &game, int prop)
     {
         popTemp.individuals.push_back(generateInitialInd(game));
     }
-    
+
     return popTemp;
 }
 
@@ -363,9 +325,7 @@ Individual mutationIndividual(Individual &ind, Game &game)
         ind.packs.at(pack_1) = pack1;
         ind.packs.at(pack_2) = pack2;
     }
-    /*for (int i = 0; i < ind.packs.size(); i++ ) {
-      //  cout<<"APRÈS - PACK "<<i<<" : "<<scorePack(ind.packs.at(i), game)<<"\n";
-        }*/
+
     return ind;
 }
 
@@ -396,11 +356,10 @@ Individual crossover(Individual &individual1, Individual &individual2, Game &gam
     Individual newIndividual;
 
     int genesPreserved = rand() % individual1.packs.size();
-    //cout<<genesPreserved<<"\n";
 
     for (int i = 0; i < genesPreserved; i++)
     {
-       
+
         if (individual1.packs.at(i).totalValue > individual2.packs.at(i).totalValue)
         {
 
@@ -448,7 +407,6 @@ Individual crossover(Individual &individual1, Individual &individual2, Game &gam
             }
             newIndividual.packs.at(x) = pack;
         }
-
     }
 
     // Fill the Individual with other random pack
@@ -531,7 +489,6 @@ int tournament(int ind1, int ind2, Game &game, Population &population)
                 {
                     index_winner = ind2;
                     ind1 = rand() % population.individuals.size();
-                    
                 }
                 else
                 {
