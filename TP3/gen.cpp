@@ -8,12 +8,11 @@
 #include <algorithm>
 #include <tuple>
 #include <map>
-#include <unistd.h>
 using namespace std;
 
 Individual generateInitialInd(Game &game)
 {
-    
+
     std::random_device random_device;
     std::mt19937 random_engine(random_device());
     std::uniform_int_distribution<int> distribution_1_100(0, game.cards.size() - 1);
@@ -158,7 +157,7 @@ void evolvePopulation(Population &population, Game &game, bool printPack)
             iterationWithSameSolution = 0;
             if (printPack)
             {
-                cout << pop.individuals.at(0).packs;
+                cout << pop.individuals.at(0).packs<<flush;
             }
             else
             {
