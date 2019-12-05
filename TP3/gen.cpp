@@ -117,35 +117,73 @@ void evolvePopulation(Population &population, Game &game)
     int bestSolution = 0;
     int iterationWithSameSolution = 0;
     int nbVirusPop = 1;
+    int apocalyps = 0;
+    bool print = 0;
     while (true)
     {
-         if (iterationWithSameSolution > WAVE_VIRUS)
-        {
-            //cout<<"Virus - "<<pop.individuals.size()<<"\n";
-            pop = virus(pop, game, nbVirusPop);
-            iterationWithSameSolution = 0;
-            if (nbVirusPop != 10) {
-            nbVirusPop++; 
+         if (apocalyps > APOCALYPS)
+            {
+
+                cout<<"DESTROY  \n";
+                pop = annihilation(pop, game);
+                iterationWithSameSolution = 0;
+                apocalyps = 0;
             }
+        if (iterationWithSameSolution > WAVE_VIRUS)
+        {
+    
+          
+                //cout << "Virus - " << pop.individuals.size() << "\n";
+                pop = virus(pop, game, nbVirusPop);
+                iterationWithSameSolution = 0;
+            
+
+            if (nbVirusPop != 5)
+            {
+                nbVirusPop++;
+            }
+            else
+            {
+                nbVirusPop = 1;
+            }
+            affichage(pop, game);
         }
-        //cout<<"Next"<<count<<" \n";
-       // cout<<"On mutate - "<<pop.individuals.size()<<"\n";
+
+        //cout << "New iteration - " << pop.individuals.size() << "\n";
+
+        affichage(pop, game);
+
+        if (print)
+            cout << "On mutate - " << pop.individuals.size() << "\n";
         pop = mutation(pop, game);
-        // cout<<"Sélection des meilleurs - "<<pop.individuals.size()<<"\n";
+        affichage(pop, game);
+        if (print)
+            cout << "Sélection des meilleurs - " << pop.individuals.size() << "\n";
         selection(pop, game, ind1, ind2);
-        //cout<<"Crossover ! - "<<pop.individuals.size()<<"\n";
+        affichage(pop, game);
+
+        if (print)
+            cout << "Crossover ! - " << pop.individuals.size() << "\n";
         newInd = crossover(ind1, ind2, game);
-        //cout<<"On push le new individu - "<<pop.individuals.size()<<"\n";
+        affichage(pop, game);
+
+        if (print)
+            cout << "On push le new individu - " << pop.individuals.size() << "\n";
         pop.individuals.push_back(newInd);
         pop.individuals.push_back(ind1);
         pop.individuals.push_back(ind2);
+        affichage(pop, game);
 
-        //cout<<"Survivants - "<<pop.individuals.size()<<"\n";
+        if (print)
+            cout << "Survivants - " << pop.individuals.size() << "\n";
         pop = selectBestOnes(pop, game.n_packs, game);
+
+        affichage(pop, game);
 
         int actualSol = fitnessIndividual(pop.individuals.at(0), game);
         if (actualSol > bestSolution)
         {
+            //pop.individuals.erase(pop.individuals.begin());
             bestSolution = actualSol;
             iterationWithSameSolution = 0;
             //cout << pop.individuals.at(0).packs;
@@ -156,12 +194,21 @@ void evolvePopulation(Population &population, Game &game)
         {
             iterationWithSameSolution++;
         }
-        //cout << pop.individuals.at(0).packs << "\n";
-        //cout << bestSolution << "\n";
-        //count++;
 
-        //usleep(200000);
+        // affichage();
+        apocalyps++;
     }
+}
+
+void affichage(Population &pop, Game &game)
+{
+    /*
+    for (int i = 0; i<pop.individuals.size(); i++) {
+    cout<<fitnessIndividual(pop.individuals.at(i), game)<<"\n";
+    
+    }
+    cout<<"\n";
+    */
 }
 
 void resolve(Population &population, Game &game)
@@ -192,24 +239,15 @@ Population selectBestOnes(Population &population, int n_best, Game &game)
     int count = 0;
     int survivant = 0;
 
-    //cout<<"On sort les survivants! \n";
     sort(population.individuals.begin(), population.individuals.end(), compareFitnessIndividual(game));
 
-    //cout<<"On prend les 50 meilleurs que l'on gardera \n";
     while (survivant < SURVIVANTS)
     {
-        //cout<<"HI!!!"<<" survivant = "<<survivant<<" AND pop size : "<<population.individuals.size()<<"\n";
-        //cout<<fitnessIndividual(population.individuals.at(survivant), game)<<"\n";
-        //if (fitnessIndividual(population.individuals.at(count), game) > 0) {
-        //       cout<<"HI!!!"<<" Count = "<<count<<" AND pop size : "<<population.individuals.size()<<"\n";
-
         newPop.individuals.push_back(population.individuals.at(survivant));
         survivant++;
-        //        }
+
     }
-    //cout<<fitnessIndividual(newPop.individuals.at(0), game)<<" avant \n";
     sort(newPop.individuals.begin(), newPop.individuals.end(), compareFitnessIndividual(game));
-    //cout<<fitnessIndividual(newPop.individuals.at(0), game)<<"après \n";
 
     return newPop;
 }
@@ -217,9 +255,6 @@ Population selectBestOnes(Population &population, int n_best, Game &game)
 Population virus(Population &pop, Game &game, int prop)
 {
     Population popTemp = pop;
-    sort(popTemp.individuals.begin(), popTemp.individuals.end(), compareFitnessIndividual(game));
-    Individual best = popTemp.individuals.at(0);
-    popTemp.individuals.erase(popTemp.individuals.begin());
 
     int victims = popTemp.individuals.size() * (PROPORTION_VIRUS * prop);
     for (int v = 0; v < victims; v++)
@@ -227,8 +262,27 @@ Population virus(Population &pop, Game &game, int prop)
         int victim = rand() % popTemp.individuals.size();
         popTemp.individuals.erase(popTemp.individuals.begin() + victim);
     }
+
     //  Generate news individuals
-    popTemp.individuals.push_back(best);
+    for (int n = 0; n < victims; n++)
+    {
+        popTemp.individuals.push_back(generateInitialInd(game));
+    }
+    
+    return popTemp;
+}
+
+Population annihilation(Population &pop, Game &game)
+{
+    Population popTemp = pop;
+
+    int victims = popTemp.individuals.size();
+    for (int v = 0; v < victims; v++)
+    {
+        popTemp.individuals.erase(popTemp.individuals.begin() + v);
+    }
+
+    //  Generate news individuals
     for (int n = 0; n < victims; n++)
     {
         popTemp.individuals.push_back(generateInitialInd(game));
@@ -250,13 +304,11 @@ Population mutation(Population &pop, Game &game)
     {
         int ind = rand() % popTemp.individuals.size();
         mutated.push_back(ind);
-        
+
         Individual newInd;
-        //cout<<"New"<<"\n";
         newInd = mutationIndividual(popTemp.individuals.at(ind), game);
         popTemp.individuals.at(ind) = newInd;
         mutations++;
-
     }
     popTemp.individuals.push_back(best);
     return popTemp;
@@ -264,28 +316,6 @@ Population mutation(Population &pop, Game &game)
 
 Individual mutationIndividual(Individual &ind, Game &game)
 {
-    /*
-    int scoreByCards[game.n_packs];
-    int scoreBySynergy[game.n_packs];
-
-    for (int i = 0; i < ind.packs.size(); i++) {
-        int scoreActualByCard;
-        int scoreActualBySynergy;
-        Pack pack;
-        for (int j = 0; j < pack.cards.size(); j++) {
-            scoreActualByCard += game.cards.at(pack.cards.at(j)); 
-            for (int y = j; j < pack.cards.size(); y++) {
-                scoreActualBySynergy += game.synergy[pack.synergy.at(j)][pack.synergy.at(y)];
-            }
-        }
-        scoreByCards[i] = scoreActualByCard;
-        scoreBySynergy[i] = scoreActualBySynergy;
-    }
-    
-        for (int i = 0; i < ind.packs.size(); i++ ) {
-              //  cout<<"AVANT - PACK "<<i<<" : "<<scorePack(ind.packs.at(i), game)<<"\n";
-            }
-*/
     int pack_1, pack_2;
     do
     {
@@ -301,11 +331,10 @@ Individual mutationIndividual(Individual &ind, Game &game)
     int found = 0;
     int max_search = MAX_SEARCH_MUTATES;
     int search = 0;
-    while (!found && search < max_search) 
+    while (!found && search < max_search)
     {
         int cards = rand() % game.n_cards;
         vector<int> cardsToSwitch;
-        //cout<<"ici : "<<search<<"\n";
         for (int p = 0; p < cards; p++)
         {
             int card_pack1 = pack1.cards.at(p);
@@ -321,15 +350,13 @@ Individual mutationIndividual(Individual &ind, Game &game)
         if (scorePack1 >= scoreBeforePack1 && scorePack2 >= scoreBeforePack2)
         {
             found = 1;
-            //cout<<"trouvé \n";
-
         }
 
         search++;
     }
-     //   cout<<"on sort \n";
 
-    if (search < max_search) {
+    if (search < max_search)
+    {
         pack1.totalValue = scorePack1;
         pack2.totalValue = scorePack2;
 
@@ -373,9 +400,7 @@ Individual crossover(Individual &individual1, Individual &individual2, Game &gam
 
     for (int i = 0; i < genesPreserved; i++)
     {
-        //cout<<"1 : "<<individual1.packs.at(i).totalValue <<"\n";
-        //cout<<"2 : "<<individual2.packs.at(i).totalValue <<"\n";
-
+       
         if (individual1.packs.at(i).totalValue > individual2.packs.at(i).totalValue)
         {
 
@@ -386,6 +411,7 @@ Individual crossover(Individual &individual1, Individual &individual2, Game &gam
             newIndividual.packs.push_back(individual2.packs.at(i));
         }
     }
+
     // *****
     // ********
     // Verify the unicity of the cards in the chosen packs
@@ -405,29 +431,24 @@ Individual crossover(Individual &individual1, Individual &individual2, Game &gam
             else
             {
                 // If already exist, remplace it by random card...
-                //cout << cardsToAdd<<" already exist... \n";
                 bool tryInsert = true;
                 while (tryInsert)
                 {
                     int random = rand() % game.cards.size();
-                    //cout<<"No! Again..."<<random<<"\n";
                     if (std::find(cardsNewInd.begin(), cardsNewInd.end(), random) == cardsNewInd.end())
                     {
                         cardsNewInd.push_back(random);
                         tryInsert = false;
-                        //  cout<<"Find! Ok bye! "<<random<< "\n";
                         pack.cards.at(c) = random;
                         pack.synergy.at(c) = random;
                         int value = scorePack(pack, game);
                         pack.totalValue = value;
-                        //  cout<<"Should be random "<<pack.cards.at(c)<<"\n";
                     }
                 }
             }
             newIndividual.packs.at(x) = pack;
         }
 
-        //cardsNewInd.insert(cardsNewInd.end(), newIndividual.packs.at(x).cards.begin(), newIndividual.packs.at(x).cards.end());
     }
 
     // Fill the Individual with other random pack
@@ -456,7 +477,6 @@ Individual crossover(Individual &individual1, Individual &individual2, Game &gam
         packToFill--;
     }
 
-    //cout<<newIndividual.packs.size()<<"\n";
     return newIndividual;
 }
 
@@ -466,13 +486,9 @@ void selection(Population &population, Game &game, Individual &winner_1, Individ
     int ind1 = rand() % population.individuals.size();
     int ind2 = rand() % population.individuals.size();
 
-    //Individual winner_1;
-    //Individual winner_2;
-
     int winner_index_1 = tournament(ind1, ind2, game, population);
     winner_1 = population.individuals.at(winner_index_1);
 
-    //Population popTemp = population;
     population.individuals.erase(population.individuals.begin() + winner_index_1);
 
     ind1 = rand() % population.individuals.size();
@@ -489,7 +505,6 @@ int tournament(int ind1, int ind2, Game &game, Population &population)
     int equality_count = 0;
     for (int i = 0; i < TOURNAMENT_ROUND; i++)
     {
-        //cout<<"Round "<<i<<" : "<<ind1<<" VS "<<ind2<<"\n";
         if (ind1 == ind2)
         {
             ind1 = rand() % population.individuals.size();
@@ -508,8 +523,6 @@ int tournament(int ind1, int ind2, Game &game, Population &population)
             if (scoreInd1 > scoreInd2)
             {
                 index_winner = ind1;
-                // cout<<"Winner ! : "<<scoreInd1<<" -> "<< index_winner<<"\n";
-                // cout<<"Loser ! : "<<scoreInd2<<" -> "<<ind2<<"\n";
                 ind2 = rand() % population.individuals.size();
             }
             else
@@ -518,15 +531,13 @@ int tournament(int ind1, int ind2, Game &game, Population &population)
                 {
                     index_winner = ind2;
                     ind1 = rand() % population.individuals.size();
-                    // cout<<"Winner ! : "<<scoreInd2<<" -> "<< index_winner<<"\n";
-                    //cout<<"Loser ! : "<<scoreInd1<<" -> "<<ind1<<"\n";
+                    
                 }
                 else
                 {
                     // no winner, equality
                     if (equality_count < equality_max)
                     {
-                        //cout<<"Equality, rematch with differents opponents"<<"\n";
                         ind1 = rand() % population.individuals.size();
                         ind2 = rand() % population.individuals.size();
                         equality_count++;
